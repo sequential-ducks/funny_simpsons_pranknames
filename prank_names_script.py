@@ -1,9 +1,11 @@
 # coding: utf-8
 """
-This program generates random funny names inspired by Bart Simpson's prank calls to Moe's Bar in The Simpsons.
-It retrieves prank call names from SimpsonsWiki, processes them into first and last name lists using dataframes,
-and allows the user to generate new names by randomly selecting from the lists. The user can continue generating
-names until they choose to quit.
+This program generates random funny names inspired by Bart Simpson's prank
+calls to Moe's Bar in The Simpsons.
+It retrieves prank call names from SimpsonsWiki, processes them into first and
+last name lists using dataframes,
+and allows the user to generate new names by randomly selecting from the lists.
+The user can continue generating names until they choose to quit.
 """
 
 import requests  # for requesting a webpage
@@ -12,7 +14,9 @@ import random  # for retrieving a random value from a list
 
 
 def request_webpage(url):
-    """This function is for requesting the content of a webpage at location url"""
+    """
+    This function is for requesting the content of a webpage at location url
+    """
     try:
         response = requests.get(url)
         # Raise any exceptions
@@ -24,7 +28,10 @@ def request_webpage(url):
 
 
 def process_tables(response):
-    """This function processes the response document into two lists of first and last names"""
+    """
+    This function processes the response document
+    into two lists of first and last names
+    """
     # Get the two tables from the html document returned
     df = pd.read_html(response.content)
     # Unpack the dataframe to two tables
@@ -38,9 +45,12 @@ def process_tables(response):
     table1 = table1.drop(34)
     table1 = table1.drop(13)
     table1 = table1.dropna(how='all')
-    # Split first columns into two additional columns by space as delimiter, with descriptors first and last names
-    table1[['first', 'last']] = table1.iloc[:, 0].str.split(' ', n=1, expand=True)
-    table2[['first', 'last']] = table2.iloc[:, 0].str.split(' ', n=1, expand=True)
+    # Split first columns into two additional columns by space as delimiter,
+    # with descriptors first and last names
+    table1[['first', 'last']] = table1.iloc[:, 0].str.split(' ', n=1,
+                                                            expand=True)
+    table2[['first', 'last']] = table2.iloc[:, 0].str.split(' ', n=1,
+                                                            expand=True)
     # Process the name columns into two lists of first and last names
     first_names = table1['first'].tolist() + table2['first'].tolist()
     last_names = table1['last'].tolist() + table2['last'].tolist()
@@ -76,7 +86,8 @@ def main():
   """)
 
     while True:
-        user_input = str(input("Press Enter to generate a name, press q to exit:  "))
+        user_input = str(input("Press Enter to generate a name, "
+                               "press q to exit:  "))
         # Terminate the while-loop without generating a name
         if user_input.lower() == 'q':
             break
