@@ -74,19 +74,17 @@ def main():
 ╚██████╔╝███████╗██║ ╚████║███████╗██║  ██║██║  ██║   ██║   ╚██████╔╝██║  ██║                                          
  ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝   
   """)
-    # Initialize a variable that will hold users' commands for executing the program
-    user_input = ""
-    while user_input != 'q':
-        user_input = str(input("Press any key to generate a name, press q to exit:  "))
-        # Don't generate a name if the user asked to quit
-        if user_input == 'q':
+
+    while True:
+        user_input = str(input("Press Enter to generate a name, press q to exit:  "))
+        # Terminate the while-loop without generating a name
+        if user_input.lower() == 'q':
             break
         # Select from lists containing names at random a first and a last name
         new_first_name = random.choice(first_names)
         new_last_name = random.choice(last_names)
         # Display the generated name
         print(f'{new_first_name} {new_last_name}')
-        continue
 
 
 if __name__ == "__main__":
