@@ -8,10 +8,10 @@ and allows the user to generate new names by randomly selecting from the lists.
 The user can continue generating names until they choose to quit.
 """
 
+import random  # for retrieving a random value from a list
+import sys #for exit
 import requests  # for requesting a webpage
 import pandas as pd  # for dataframes which manipulate tables
-import random  # for retrieving a random value from a list
-
 from requests import RequestException
 
 
@@ -34,10 +34,11 @@ def process_tables(response):
     This function processes the response document
     into two lists of first and last names
     """
-    # Get the two tables from the html document returned
+    # Get the tables from the html document returned
     df = pd.read_html(response.content)
-    # Unpack the dataframe to two tables
-    table1, table2 = df
+    # Unpack the dataframe to two first tables
+    table1, table2, *tables = df
+    del tables
     # Separate the name column from other episode data columns
     table1 = table1.iloc[1:, 1:2]
     table2 = table2.iloc[1:, 1:2]
@@ -62,12 +63,12 @@ def process_tables(response):
 
 
 def main():
+    """The main process loop for generating names"""
     url = "https://simpsons.fandom.com/wiki/Bart%27s_prank_calls"
     response = request_webpage(url)
     if response is None:
-        exit()
+        sys.exit()
     first_names, last_names = process_tables(response)
-    # Display a welcome message
     print(
         "Welcome to generating amusing names in the style of prank calls "
         "made by Bart Simpson on the classic show The Simpsons!"
@@ -75,15 +76,12 @@ def main():
 
     while True:
         user_input = str(
-            input("Press Enter to generate a name, " "press q to exit:  ")
+            input("Press Enter to generate a name or press q to exit:  ")
         )
-        # Terminate the while-loop without generating a name
         if user_input.lower() == "q":
             break
-        # Select from lists containing names at random a first and a last name
         new_first_name = random.choice(first_names)
         new_last_name = random.choice(last_names)
-        # Display the generated name
         print(f"{new_first_name} {new_last_name}")
 
 
