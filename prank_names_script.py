@@ -12,21 +12,46 @@ import random  # for retrieving a random value from a list
 import sys #for exit
 import requests  # for requesting a webpage
 import pandas as pd  # for dataframes which manipulate tables
-from requests import RequestException
 
 
 def request_webpage(url):
     """
     This function is for requesting the content of a webpage at location url
+
+    --------------- Usage examples --------------------
+
+    Request is successful:
+    >>> request_webpage("https://www.python.org/")
+    <Response [200]>
+
+    Incorrect url schema:
+    >>> request_webpage('notanurl')
+    Missing schema: include http or https
+
+    Address is not found:
+    >>> request_webpage('https://www.google.com/404')
+    HTTP Error
+
+    Website timeout:
+    >>> request_webpage('https://10.255.255.1/')
+    Timed out
     """
+
     try:
         response = requests.get(url, timeout=10)
         # Raise any exceptions
         response.raise_for_status()
+    except requests.exceptions.ReadTimeout:
+        print('Timed out')
+    except requests.exceptions.MissingSchema:
+        print('Missing schema: include http or https')
+    except requests.exceptions.ConnectionError:
+        print('Connection error')
+    except requests.exceptions.HTTPError:
+        print('HTTP Error')
+    else:
         return response
-    except RequestException as e:
-        print(f"Error {e} during web page retrieval")
-        return None
+
 
 
 def process_tables(response):
@@ -39,7 +64,7 @@ def process_tables(response):
     # Unpack the dataframe to two first tables
     table1, table2, *tables = df
     del tables
-    if not table1 or not table2:
+    if table1.empty or table2.empty:
         return None
     # Separate the name column from other episode data columns
     table1 = table1.iloc[1:, 1:2]
@@ -64,6 +89,17 @@ def process_tables(response):
     return first_names, last_names
 
 
+def print_new_names(first_names=[], last_names=[]):
+    while True:
+        user_input = str(
+            input("Press Enter to generate a name or press q to exit:  "))
+        if user_input.lower() == "q":
+            return
+        new_first_name = random.choice(first_names)
+        new_last_name = random.choice(last_names)
+        print(f"{new_first_name} {new_last_name}")
+
+
 def main():
     """The main process loop for generating names"""
     url = "https://simpsons.fandom.com/wiki/Bart%27s_prank_calls"
@@ -72,25 +108,15 @@ def main():
     if response is None:
         sys.exit()
 
-    first_names, last_names = process_tables(response)
+    list_of_first_names, list_of_last_names = process_tables(response)
 
-    if not first_names or last_names:
+    if not list_of_first_names or not list_of_last_names:
         sys.exit()
 
     print(
         "Welcome to generating amusing names in the style of prank calls "
-        "made by Bart Simpson on the classic show The Simpsons!"
-    )
-    while True:
-        user_input = str(
-            input("Press Enter to generate a name or press q to exit:  ")
-        )
-        if user_input.lower() == "q":
-            break
-        new_first_name = random.choice(first_names)
-        new_last_name = random.choice(last_names)
-        print(f"{new_first_name} {new_last_name}")
-
+        "made by Bart Simpson on the classic show The Simpsons!")
+    print_new_names(list_of_first_names, list_of_last_names)
 
 if __name__ == "__main__":
     main()
