@@ -39,6 +39,8 @@ def process_tables(response):
     # Unpack the dataframe to two first tables
     table1, table2, *tables = df
     del tables
+    if not table1 or not table2:
+        return None
     # Separate the name column from other episode data columns
     table1 = table1.iloc[1:, 1:2]
     table2 = table2.iloc[1:, 1:2]
@@ -66,14 +68,19 @@ def main():
     """The main process loop for generating names"""
     url = "https://simpsons.fandom.com/wiki/Bart%27s_prank_calls"
     response = request_webpage(url)
+
     if response is None:
         sys.exit()
+
     first_names, last_names = process_tables(response)
+
+    if not first_names or last_names:
+        sys.exit()
+
     print(
         "Welcome to generating amusing names in the style of prank calls "
         "made by Bart Simpson on the classic show The Simpsons!"
     )
-
     while True:
         user_input = str(
             input("Press Enter to generate a name or press q to exit:  ")
