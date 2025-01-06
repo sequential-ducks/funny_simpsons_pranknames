@@ -12,17 +12,19 @@ import requests  # for requesting a webpage
 import pandas as pd  # for dataframes which manipulate tables
 import random  # for retrieving a random value from a list
 
+from requests import RequestException
+
 
 def request_webpage(url):
     """
     This function is for requesting the content of a webpage at location url
     """
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         # Raise any exceptions
         response.raise_for_status()
         return response
-    except Exception as e:
+    except RequestException as e:
         print(f"Error {e} during web page retrieval")
         return None
 
@@ -44,58 +46,45 @@ def process_tables(response):
     table1 = table1.drop(32)
     table1 = table1.drop(34)
     table1 = table1.drop(13)
-    table1 = table1.dropna(how='all')
+    table1 = table1.dropna(how="all")
     # Split first columns into two additional columns by space as delimiter,
     # with descriptors first and last names
-    table1[['first', 'last']] = table1.iloc[:, 0].str.split(' ', n=1,
-                                                            expand=True)
-    table2[['first', 'last']] = table2.iloc[:, 0].str.split(' ', n=1,
-                                                            expand=True)
+    table1[["first", "last"]] = table1.iloc[:, 0].str.split(
+        " ", n=1, expand=True
+    )
+    table2[["first", "last"]] = table2.iloc[:, 0].str.split(
+        " ", n=1, expand=True
+    )
     # Process the name columns into two lists of first and last names
-    first_names = table1['first'].tolist() + table2['first'].tolist()
-    last_names = table1['last'].tolist() + table2['last'].tolist()
+    first_names = table1["first"].tolist() + table2["first"].tolist()
+    last_names = table1["last"].tolist() + table2["last"].tolist()
     return first_names, last_names
 
 
 def main():
-    url = 'https://simpsons.fandom.com/wiki/Bart%27s_prank_calls'
+    url = "https://simpsons.fandom.com/wiki/Bart%27s_prank_calls"
     response = request_webpage(url)
     if response is None:
         exit()
     first_names, last_names = process_tables(response)
     # Display a welcome message
-    print("""
-██████╗  █████╗ ██████╗ ████████╗    ███████╗██╗███╗   ███╗██████╗ ███████╗ ██████╗ ███╗   ██╗███████╗                 
-██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝    ██╔════╝██║████╗ ████║██╔══██╗██╔════╝██╔═══██╗████╗  ██║██╔════╝                 
-██████╔╝███████║██████╔╝   ██║       ███████╗██║██╔████╔██║██████╔╝███████╗██║   ██║██╔██╗ ██║███████╗                 
-██╔══██╗██╔══██║██╔══██╗   ██║       ╚════██║██║██║╚██╔╝██║██╔═══╝ ╚════██║██║   ██║██║╚██╗██║╚════██║                 
-██████╔╝██║  ██║██║  ██║   ██║       ███████║██║██║ ╚═╝ ██║██║     ███████║╚██████╔╝██║ ╚████║███████║                 
-╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝       ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝                 
-██████╗ ██████╗  █████╗ ███╗   ██╗██╗  ██╗     ██████╗ █████╗ ██╗     ██╗         ███╗   ██╗ █████╗ ███╗   ███╗███████╗
-██╔══██╗██╔══██╗██╔══██╗████╗  ██║██║ ██╔╝    ██╔════╝██╔══██╗██║     ██║         ████╗  ██║██╔══██╗████╗ ████║██╔════╝
-██████╔╝██████╔╝███████║██╔██╗ ██║█████╔╝     ██║     ███████║██║     ██║         ██╔██╗ ██║███████║██╔████╔██║█████╗  
-██╔═══╝ ██╔══██╗██╔══██║██║╚██╗██║██╔═██╗     ██║     ██╔══██║██║     ██║         ██║╚██╗██║██╔══██║██║╚██╔╝██║██╔══╝  
-██║     ██║  ██║██║  ██║██║ ╚████║██║  ██╗    ╚██████╗██║  ██║███████╗███████╗    ██║ ╚████║██║  ██║██║ ╚═╝ ██║███████╗
-╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝     ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝    ╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝
- ██████╗ ███████╗███╗   ██╗███████╗██████╗  █████╗ ████████╗ ██████╗ ██████╗                                           
-██╔════╝ ██╔════╝████╗  ██║██╔════╝██╔══██╗██╔══██╗╚══██╔══╝██╔═══██╗██╔══██╗                                          
-██║  ███╗█████╗  ██╔██╗ ██║█████╗  ██████╔╝███████║   ██║   ██║   ██║██████╔╝                                          
-██║   ██║██╔══╝  ██║╚██╗██║██╔══╝  ██╔══██╗██╔══██║   ██║   ██║   ██║██╔══██╗                                          
-╚██████╔╝███████╗██║ ╚████║███████╗██║  ██║██║  ██║   ██║   ╚██████╔╝██║  ██║                                          
- ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝   
-  """)
+    print(
+        "Welcome to generating amusing names in the style of prank calls "
+        "made by Bart Simpson on the classic show The Simpsons!"
+    )
 
     while True:
-        user_input = str(input("Press Enter to generate a name, "
-                               "press q to exit:  "))
+        user_input = str(
+            input("Press Enter to generate a name, " "press q to exit:  ")
+        )
         # Terminate the while-loop without generating a name
-        if user_input.lower() == 'q':
+        if user_input.lower() == "q":
             break
         # Select from lists containing names at random a first and a last name
         new_first_name = random.choice(first_names)
         new_last_name = random.choice(last_names)
         # Display the generated name
-        print(f'{new_first_name} {new_last_name}')
+        print(f"{new_first_name} {new_last_name}")
 
 
 if __name__ == "__main__":
