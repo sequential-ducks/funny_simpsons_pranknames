@@ -89,15 +89,13 @@ def process_tables(response):
     return first_names, last_names
 
 
-def print_new_names(first_names=[], last_names=[]):
-    while True:
-        user_input = str(
-            input("Press Enter to generate a name or press q to exit:  "))
-        if user_input.lower() == "q":
-            return
-        new_first_name = random.choice(first_names)
-        new_last_name = random.choice(last_names)
-        print(f"{new_first_name} {new_last_name}")
+def random_combine_string_lists(a=None, b=None):
+
+    if a is None or b is None:
+        return None
+
+    ab_random_string  = f'{random.choice(a)} {random.choice(b)}'
+    return ab_random_string
 
 
 def main():
@@ -114,9 +112,16 @@ def main():
         sys.exit()
 
     print(
-        "Welcome to generating amusing names in the style of prank calls "
+        "\nWelcome to generating amusing names in the style of prank calls "
         "made by Bart Simpson on the classic show The Simpsons!")
-    print_new_names(list_of_first_names, list_of_last_names)
+    while True:
+        user_input = str(
+            input("\nPress Enter to generate a name or press q to exit:  "))
+        if user_input.lower() == "q":
+            return
+        new_name = random_combine_string_lists(list_of_first_names,
+                                               list_of_last_names)
+        print(f'{new_name}')
 
 if __name__ == "__main__":
     main()
