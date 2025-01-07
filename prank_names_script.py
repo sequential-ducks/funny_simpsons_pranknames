@@ -21,23 +21,29 @@ def get_request(url : str) -> Response | None:
     """
     This function is for requesting the content of a webpage at location url
 
-    --------------- Usage examples --------------------
+    Args:
+        url (str): The website address to make a get request to
 
+    Returns:
+        requests.Response or None: Returns the servers' response if no errors
+        occurred otherwise None
+
+    --------------- Examples --------------------
     Request is successful:
-    >>> get_request("https://www.python.org/")
-    <Response [200]>
+        >>> get_request("https://www.python.org/")
+        <Response [200]>
 
     Incorrect url schema:
-    >>> get_request('notanurl')
-    Missing schema: include http or https
+        >>> get_request('notanurl')
+        Missing schema: include http or https
 
     Address is not found:
-    >>> get_request('https://www.google.com/404')
-    HTTP Error
+        >>> get_request('https://www.google.com/404')
+        HTTP Error
 
     Website timeout:
-    >>> get_request('https://10.255.255.1/')
-    Timed out
+        >>> get_request('https://10.255.255.1/')
+        Timed out
     """
 
     try:
@@ -46,12 +52,16 @@ def get_request(url : str) -> Response | None:
         response.raise_for_status()
     except requests.exceptions.ReadTimeout:
         print('Timed out')
+        return None
     except requests.exceptions.MissingSchema:
         print('Missing schema: include http or https')
+        return None
     except requests.exceptions.ConnectionError:
         print('Connection error')
+        return None
     except requests.exceptions.HTTPError:
         print('HTTP Error')
+        return None
     else:
         # Response is OK
         return response
@@ -95,7 +105,7 @@ def process_tables(response):
 
 def random_combine_string_lists(a: Optional[list[str]] = None,
                                 b: Optional[list[str]] = None) \
-                                -> Optional[list[str]]:
+                                -> str | None:
 
 
     if a is None or b is None:
