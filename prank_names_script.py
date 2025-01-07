@@ -9,31 +9,34 @@ The user can continue generating names until they choose to quit.
 """
 
 import random  # for retrieving a random value from a list
-import sys #for exit
+import sys # for exit
+from typing import Optional # Optional type hint
+
 import requests  # for requesting a webpage
 import pandas as pd  # for dataframes which manipulate tables
+from requests import Response # Response type hint
 
 
-def request_webpage(url):
+def get_request(url : str) -> Response | None:
     """
     This function is for requesting the content of a webpage at location url
 
     --------------- Usage examples --------------------
 
     Request is successful:
-    >>> request_webpage("https://www.python.org/")
+    >>> get_request("https://www.python.org/")
     <Response [200]>
 
     Incorrect url schema:
-    >>> request_webpage('notanurl')
+    >>> get_request('notanurl')
     Missing schema: include http or https
 
     Address is not found:
-    >>> request_webpage('https://www.google.com/404')
+    >>> get_request('https://www.google.com/404')
     HTTP Error
 
     Website timeout:
-    >>> request_webpage('https://10.255.255.1/')
+    >>> get_request('https://10.255.255.1/')
     Timed out
     """
 
@@ -50,6 +53,7 @@ def request_webpage(url):
     except requests.exceptions.HTTPError:
         print('HTTP Error')
     else:
+        # Response is OK
         return response
 
 
@@ -89,7 +93,10 @@ def process_tables(response):
     return first_names, last_names
 
 
-def random_combine_string_lists(a=None, b=None):
+def random_combine_string_lists(a: Optional[list[str]] = None,
+                                b: Optional[list[str]] = None) \
+                                -> Optional[list[str]]:
+
 
     if a is None or b is None:
         return None
@@ -101,7 +108,7 @@ def random_combine_string_lists(a=None, b=None):
 def main():
     """The main process loop for generating names"""
     url = "https://simpsons.fandom.com/wiki/Bart%27s_prank_calls"
-    response = request_webpage(url)
+    response = get_request(url)
 
     if response is None:
         sys.exit()
