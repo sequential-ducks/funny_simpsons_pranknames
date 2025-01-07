@@ -17,7 +17,7 @@ import pandas as pd  # for dataframes which manipulate tables
 from requests import Response  # Response type hint
 
 
-def get_request(url: str) -> Response | None:
+def get_request(url: str) -> Optional[Response]:
     """
     Request the content of a webpage at location url
 
@@ -68,15 +68,19 @@ def get_request(url: str) -> Response | None:
 
 
 def process_response_to_df_tables(r: requests.models.Response) \
-                                                -> pd.DataFrame | None:
+                                                        -> (pd.DataFrame
+                                                        | list[pd.DataFrame]
+                                                        | None):
     """
     Extract html tables from a request into one pandas' dataframe
 
     :param r:
         Response object returned by a web request
     :return
-        Dataframe object containing all tables of a html document
+        Dataframe object containing all tables of a html document, if page
+        contains more than one it is a list of dataframe objects
     """
+
     try:
         assert type(r) == requests.models.Response
     except AssertionError:
@@ -90,35 +94,13 @@ def process_response_to_df_tables(r: requests.models.Response) \
     df = pd.read_html(r.content)
     return df
 
-def unpack_df_into_list(df : pd.DataFrame) -> Optional[list[pd.DataFrame]]:
-    """
 
-    :param df: pd.Dataframe containing multiple dataframes to unpack
-    :return: list[pd.Dataframe] or None
-    """
-
-    try:
-        assert type(df) == pd.DataFrame
-    except AssertionError:
-        print('No dataframe was passed to unpack_df_into_list function')
-        return None
-
-
-
-
-
-
-
-def process_tables(response):
+def process_tables(table1 : pd.DataFrame, table2 : pd.DataFrame):
     """
     This function processes the response document
     into two lists of first and last names
     """
-    # Get the tables from the html document returned
-    # Unpack the dataframe to two first tables
-    del tables
-    if table1.empty or table2.empty:
-        return None
+
     # Separate the name column from other episode data columns
     table1 = table1.iloc[1:, 1:2]
     table2 = table2.iloc[1:, 1:2]
@@ -141,7 +123,8 @@ def process_tables(response):
 
 
 def random_combine_string_lists(a: Optional[list[str]] = None,
-                                b: Optional[list[str]] = None) -> str | None:
+                                b: Optional[list[str]] = None) \
+                                -> Optional[str]:
     """
     :param a:
     :param b:
@@ -163,10 +146,9 @@ def main():
         sys.exit()
 
     df = process_response_to_df_tables(response)
-    df_tuple = unpack_pd_df_into_tuple(df)
-    if df_tuple.len() > 1:
-        table1, table2, *tables = df_tuple
-    list_of_first_names, list_of_last_names = process_tables(response)
+    table1 = df[0]
+    table2 = df[1]
+    list_of_first_names, list_of_last_names = process_tables(table1, table2)
 
     if not list_of_first_names or not list_of_last_names:
         sys.exit()
