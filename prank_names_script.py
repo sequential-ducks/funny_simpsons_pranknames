@@ -9,26 +9,26 @@ The user can continue generating names until they choose to quit.
 """
 
 import random  # for retrieving a random value from a list
-import sys # for exit
-from typing import Optional # Optional type hint
+import sys  # for exit
+from typing import Optional  # Optional type hint
 
 import requests  # for requesting a webpage
 import pandas as pd  # for dataframes which manipulate tables
-from requests import Response # Response type hint
+from requests import Response  # Response type hint
 
 
-def get_request(url : str) -> Response | None:
+def get_request(url: str) -> Response | None:
     """
-    This function is for requesting the content of a webpage at location url
+    Request the content of a webpage at location url
 
-    Args:
+    :param
         url (str): The website address to make a get request to
 
-    Returns:
-        requests.Response or None: Returns the servers' response if no errors
-        occurred otherwise None
+    :return
+        Server esponse if no errors occurred otherwise None
 
-    --------------- Examples --------------------
+    ------------- Examples ----------------------
+
     Request is successful:
         >>> get_request("https://www.python.org/")
         <Response [200]>
@@ -67,6 +67,33 @@ def get_request(url : str) -> Response | None:
         return response
 
 
+def process_response_to_df_tables(r: requests.models.Response) \
+                                                -> pd.DataFrame | None:
+    """
+    Extract html tables from a request into one pandas' dataframe
+
+    :param r:
+        Response object returned by a web request
+    :return
+        Dataframe object containing all tables of a html document
+    """
+    try:
+        assert type(r) == requests.models.Response
+    except AssertionError:
+        print("Invalid argument to function 'process_response_to_df_tables'")
+        return None
+
+    if not r.text.find('<table>'):
+        print('Response contains no tables to process')
+        return None
+
+    df = pd.read_html(r.content)
+    return df
+
+def unpack_pd_df_into_tuple(df : pd.DataFrame) -> tuple[pd.DataFrame, ...]:
+    table1,  *tables = df
+    return table1, tables
+
 
 def process_tables(response):
     """
@@ -74,9 +101,7 @@ def process_tables(response):
     into two lists of first and last names
     """
     # Get the tables from the html document returned
-    df = pd.read_html(response.content)
     # Unpack the dataframe to two first tables
-    table1, table2, *tables = df
     del tables
     if table1.empty or table2.empty:
         return None
@@ -91,12 +116,10 @@ def process_tables(response):
     table1 = table1.dropna(how="all")
     # Split first columns into two additional columns by space as delimiter,
     # with descriptors first and last names
-    table1[["first", "last"]] = table1.iloc[:, 0].str.split(
-        " ", n=1, expand=True
-    )
-    table2[["first", "last"]] = table2.iloc[:, 0].str.split(
-        " ", n=1, expand=True
-    )
+    table1[["first", "last"]] = table1.iloc[:, 0].str.split(" ", n=1,
+        expand=True)
+    table2[["first", "last"]] = table2.iloc[:, 0].str.split(" ", n=1,
+        expand=True)
     # Process the name columns into two lists of first and last names
     first_names = table1["first"].tolist() + table2["first"].tolist()
     last_names = table1["last"].tolist() + table2["last"].tolist()
@@ -104,14 +127,16 @@ def process_tables(response):
 
 
 def random_combine_string_lists(a: Optional[list[str]] = None,
-                                b: Optional[list[str]] = None) \
-                                -> str | None:
-
-
+                                b: Optional[list[str]] = None) -> str | None:
+    """
+    :param a:
+    :param b:
+    :return:
+    """
     if a is None or b is None:
         return None
 
-    ab_random_string  = f'{random.choice(a)} {random.choice(b)}'
+    ab_random_string = f'{random.choice(a)} {random.choice(b)}'
     return ab_random_string
 
 
@@ -123,14 +148,17 @@ def main():
     if response is None:
         sys.exit()
 
+    df = process_response_to_df_tables(response)
+    df_tuple = unpack_pd_df_into_tuple(df)
+    if df_tuple.len() > 1:
+        table1, table2, *tables = df_tuple
     list_of_first_names, list_of_last_names = process_tables(response)
 
     if not list_of_first_names or not list_of_last_names:
         sys.exit()
 
-    print(
-        "\nWelcome to generating amusing names in the style of prank calls "
-        "made by Bart Simpson on the classic show The Simpsons!")
+    print("\nWelcome to generating amusing names in the style of prank calls "
+          "made by Bart Simpson on the classic show The Simpsons!")
     while True:
         user_input = str(
             input("\nPress Enter to generate a name or press q to exit:  "))
@@ -139,6 +167,7 @@ def main():
         new_name = random_combine_string_lists(list_of_first_names,
                                                list_of_last_names)
         print(f'{new_name}')
+
 
 if __name__ == "__main__":
     main()
