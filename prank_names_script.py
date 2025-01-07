@@ -90,9 +90,23 @@ def process_response_to_df_tables(r: requests.models.Response) \
     df = pd.read_html(r.content)
     return df
 
-def unpack_pd_df_into_tuple(df : pd.DataFrame) -> tuple[pd.DataFrame, ...]:
-    table1,  *tables = df
-    return table1, tables
+def unpack_df_into_list(df : pd.DataFrame) -> Optional[list[pd.DataFrame]]:
+    """
+
+    :param df: pd.Dataframe containing multiple dataframes to unpack
+    :return: list[pd.Dataframe] or None
+    """
+
+    try:
+        assert type(df) == pd.DataFrame
+    except AssertionError:
+        print('No dataframe was passed to unpack_df_into_list function')
+        return None
+
+
+
+
+
 
 
 def process_tables(response):
