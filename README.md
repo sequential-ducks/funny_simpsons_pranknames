@@ -1,4 +1,4 @@
-
+This README was created in collaboration with chatgpt 
 # Prank Call Name Generator 🎉
 
 ![Bart Simpson Prank Call Vibes](https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3R1dWs4MzR6Z2p2c2R1YjBwMDNtYXhmZGliZmR6cDAzZGszMTBpZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT5LMSpdMqGMvQRkFa/giphy.gif)
