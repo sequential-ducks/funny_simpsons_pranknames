@@ -54,7 +54,7 @@ This project demonstrates:
    .venv\Scripts\activate
    ```
 2. Install dependencies:
-       ```bash
+    ```bash
    uv sync
    ```
 3. Run the script:  
