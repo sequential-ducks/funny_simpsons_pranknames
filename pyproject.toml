@@ -1,0 +1,12 @@
+[project]
+name = "prankcall-python"
+version = "0.1.0"
+description = "Python script for generating prank names that would suit a prank call in The Simpsons" 
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "lxml>=5.3.0",
+    "pandas>=2.2.3",
+    "requests>=2.32.3",
+    "typing>=3.10.0.0",
+]
