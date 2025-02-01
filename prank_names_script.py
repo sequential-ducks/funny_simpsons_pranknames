@@ -6,6 +6,7 @@ It retrieves prank call names from SimpsonsWiki, processes them into first and
 last name lists using dataframes,
 and allows the user to generate new names by randomly selecting from the lists.
 The user can continue generating names until they choose to quit.
+No AI was used in the development.
 """
 
 import random  # for retrieving a random value from a list
